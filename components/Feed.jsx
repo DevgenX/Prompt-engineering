@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 
 import PromptCard from "./PromptCard";
 
@@ -33,17 +33,20 @@ const Feed = () => {
     fetchPrompts();
   }, []);
 
-  const handleFilterPrompts = (input) => {
-    const regex = new RegExp(input, "i"); // 'i' flag for case-insensitive search
-    return posts.filter(
-      (item) =>
-        regex.test(item.creator.username) ||
-        regex.test(item.tag) ||
-        regex.test(item.prompt)
-    );
-  };
+  const handleFilterPrompts = useCallback(
+    (input) => {
+      const regex = new RegExp(input, "i"); // 'i' flag for case-insensitive search
+      return posts.filter(
+        (item) =>
+          regex.test(item.creator.username) ||
+          regex.test(item.tag) ||
+          regex.test(item.prompt)
+      );
+    },
+    [posts]
+  );
 
-  const handleSearchChange = (e) => {
+  const handleSearchChange = useCallback((e) => {
     clearTimeout(searchTimeout);
     setSearchText(e.target.value);
     setSearchTimeout(
@@ -52,7 +55,7 @@ const Feed = () => {
         setSearchResults(searchResult);
       }, 500)
     );
-  };
+  }, []);
 
   const handleTagClick = (tagName) => {
     setSearchText(tagName);

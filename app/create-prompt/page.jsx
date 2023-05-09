@@ -9,7 +9,7 @@ import Form from "@components/Form";
 const Prompt = () => {
   const router = useRouter();
   const { data: session } = useSession();
-  const [isSubmitting, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [post, setPost] = useState({
     prompt: "",
     tag: "",
@@ -17,7 +17,7 @@ const Prompt = () => {
 
   const handleCreatePrompt = async (e) => {
     e.preventDefault();
-    setIsSubmitted(true);
+    setIsSubmitting(true);
 
     try {
       const response = await fetch("/api/prompt/new", {
@@ -35,7 +35,7 @@ const Prompt = () => {
     } catch (e) {
       console.error(e);
     } finally {
-      setIsSubmitted(false);
+      setIsSubmitting(false);
     }
   };
 
