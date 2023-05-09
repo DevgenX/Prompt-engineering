@@ -9,7 +9,6 @@ const EditPrompt = () => {
   const router = useRouter();
   const [isSubmitting, setIsSubmitted] = useState(false);
   const searchParams = useSearchParams();
-  console.log(searchParams);
   const promptId = searchParams.get("id");
   const [post, setPost] = useState({
     prompt: "",
