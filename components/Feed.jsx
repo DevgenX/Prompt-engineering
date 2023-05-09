@@ -9,7 +9,7 @@ const PromptCardList = ({ data, handleTagClick }) => {
     <div className="mt-16 prompt_layout">
       {data.map((post) => (
         <PromptCard
-          key={post._id}
+          key={post?._id}
           post={post}
           handleTagClick={handleTagClick}
         />
@@ -19,11 +19,10 @@ const PromptCardList = ({ data, handleTagClick }) => {
 };
 
 const Feed = () => {
-  const [searchText, setSearchText] = useState("");
   const [posts, setPosts] = useState([]);
-  const handleSearch = (e) => {
-    setSearchText(e.target.value);
-  };
+  const [searchText, setSearchText] = useState("");
+  const [searchTimeout, setSearchTimeout] = useState(null);
+  const [searchResults, setSearchResults] = useState([]);
 
   useEffect(() => {
     const fetchPrompts = async () => {
@@ -34,6 +33,34 @@ const Feed = () => {
     fetchPrompts();
   }, []);
 
+  const handleFilterPrompts = (input) => {
+    const regex = new RegExp(input, "i"); // 'i' flag for case-insensitive search
+    return posts.filter(
+      (item) =>
+        regex.test(item.creator.username) ||
+        regex.test(item.tag) ||
+        regex.test(item.prompt)
+    );
+  };
+
+  const handleSearchChange = (e) => {
+    clearTimeout(searchTimeout);
+    setSearchText(e.target.value);
+    setSearchTimeout(
+      setTimeout(() => {
+        const searchResult = handleFilterPrompts(e.target.value);
+        setSearchResults(searchResult);
+      }, 500)
+    );
+  };
+
+  const handleTagClick = (tagName) => {
+    setSearchText(tagName);
+
+    const searchResult = handleFilterPrompts(tagName);
+    setSearchResults(searchResult);
+  };
+
   return (
     <section className="feed">
       <form className="relative w-full flex-center">
@@ -41,12 +68,16 @@ const Feed = () => {
           type="text"
           placeholder="Search for tags or users"
           value={searchText}
-          onChange={handleSearch}
+          onChange={handleSearchChange}
           required
           className="search_input peer"
         />
       </form>
-      <PromptCardList data={posts} handleTagClick={() => {}} />
+      {searchText ? (
+        <PromptCardList data={searchResults} handleTagClick={handleTagClick} />
+      ) : (
+        <PromptCardList data={posts} handleTagClick={handleTagClick} />
+      )}
     </section>
   );
 };
